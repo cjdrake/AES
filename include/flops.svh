@@ -52,7 +52,7 @@ end
 `define SRFF(q, s, r, clk) \
 `DFF(q, q?~(r):(s), clk)
 
-// SR flip-flop w/ async reset_tb
+// SR flip-flop w/ async reset_n
 `define SRFF_ARN(q, s, r, clk, ar, arval) \
 `DFF_ARN(q, q?~(r):(s), clk, ar, arval)
 
