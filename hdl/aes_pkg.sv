@@ -82,19 +82,23 @@ const bit [15:0] MA [4] = '{16'h2311, 16'h1231, 16'h1123, 16'h3112};
 
 const bit [15:0] IMA [4] = '{16'hebd9, 16'h9ebd, 16'hd9eb, 16'hbd9e};
 
-function automatic logic [31:0] SubWord(logic [3:0] [7:0] w);
+function automatic logic [31:0]
+SubWord(logic [3:0] [7:0] w);
     return {SBOX[w[3]], SBOX[w[2]], SBOX[w[1]], SBOX[w[0]]};
 endfunction
 
-function automatic logic [31:0] InvSubWord(logic [3:0] [7:0] w);
+function automatic logic [31:0]
+InvSubWord(logic [3:0] [7:0] w);
     return {ISBOX[w[3]], ISBOX[w[2]], ISBOX[w[1]], ISBOX[w[0]]};
 endfunction
 
-function automatic logic [31:0] RotWord(logic [3:0] [7:0] w);
+function automatic logic [31:0]
+RotWord(logic [3:0] [7:0] w);
     return {w[0], w[3], w[2], w[1]};
 endfunction
 
-function automatic logic [127:0] AddRoundKey(logic [3:0] [31:0] state, logic [31:0] rkey [4]);
+function automatic logic [127:0]
+AddRoundKey(logic [3:0] [31:0] state, logic [31:0] rkey [4]);
     return {
         state[3] ^ rkey[3],
         state[2] ^ rkey[2],
@@ -103,7 +107,8 @@ function automatic logic [127:0] AddRoundKey(logic [3:0] [31:0] state, logic [31
     };
 endfunction
 
-function automatic logic [127:0] SubBytes(logic [3:0] [31:0] state);
+function automatic logic [127:0]
+SubBytes(logic [3:0] [31:0] state);
     return {
         SubWord(state[3]),
         SubWord(state[2]),
@@ -112,7 +117,8 @@ function automatic logic [127:0] SubBytes(logic [3:0] [31:0] state);
     };
 endfunction
 
-function automatic logic [127:0] InvSubBytes(logic [3:0] [31:0] state);
+function automatic logic [127:0]
+InvSubBytes(logic [3:0] [31:0] state);
     return {
         InvSubWord(state[3]),
         InvSubWord(state[2]),
@@ -121,21 +127,24 @@ function automatic logic [127:0] InvSubBytes(logic [3:0] [31:0] state);
     };
 endfunction
 
-function automatic logic [127:0] ShiftRows(logic [3:0] [3:0] [7:0] state);
+function automatic logic [127:0]
+ShiftRows(logic [3:0] [3:0] [7:0] state);
     return { state[2][3], state[1][2], state[0][1], state[3][0],
              state[1][3], state[0][2], state[3][1], state[2][0],
              state[0][3], state[3][2], state[2][1], state[1][0],
              state[3][3], state[2][2], state[1][1], state[0][0] };
 endfunction
 
-function automatic logic [127:0] InvShiftRows(logic [3:0] [3:0] [7:0] state);
+function automatic logic [127:0]
+InvShiftRows(logic [3:0] [3:0] [7:0] state);
     return { state[0][3], state[1][2], state[2][1], state[3][0],
              state[3][3], state[0][2], state[1][1], state[2][0],
              state[2][3], state[3][2], state[0][1], state[1][0],
              state[1][3], state[2][2], state[3][1], state[0][0] };
 endfunction
 
-function automatic logic [127:0] MixColumns(logic [3:0] [3:0] [7:0] state);
+function automatic logic [127:0]
+MixColumns(logic [3:0] [3:0] [7:0] state);
     return {
         Multiply(MA, state[3]),
         Multiply(MA, state[2]),
@@ -144,7 +153,8 @@ function automatic logic [127:0] MixColumns(logic [3:0] [3:0] [7:0] state);
     };
 endfunction
 
-function automatic logic [127:0] InvMixColumns(logic [3:0] [3:0] [7:0] state);
+function automatic logic [127:0]
+InvMixColumns(logic [3:0] [3:0] [7:0] state);
     return {
         Multiply(IMA, state[3]),
         Multiply(IMA, state[2]),
@@ -153,7 +163,8 @@ function automatic logic [127:0] InvMixColumns(logic [3:0] [3:0] [7:0] state);
     };
 endfunction
 
-function automatic logic [31:0] Multiply(bit [3:0] [3:0] a [4], logic [0:3] [7:0] col);
+function automatic logic [31:0]
+Multiply(bit [3:0] [3:0] a [4], logic [0:3] [7:0] col);
     return {
         RowXCol(a[3], col),
         RowXCol(a[2], col),
@@ -162,14 +173,16 @@ function automatic logic [31:0] Multiply(bit [3:0] [3:0] a [4], logic [0:3] [7:0
     };
 endfunction
 
-function automatic logic [7:0] RowXCol(bit [3:0] [3:0] row, logic [0:3] [7:0] col);
+function automatic logic [7:0]
+RowXCol(bit [3:0] [3:0] row, logic [0:3] [7:0] col);
     RowXCol = 8'h0;
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
             if (row[i][j]) RowXCol ^= xtime(col[i], j);
 endfunction
 
-function automatic logic [7:0] xtime(logic [7:0] b, int n);
+function automatic logic [7:0]
+xtime(logic [7:0] b, int n);
     xtime = b;
     for (int i = 0; i < n; i++)
         xtime = {xtime[6:0], 1'b0} ^ (8'h1b & {8{xtime[7]}});
