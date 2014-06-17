@@ -1,4 +1,4 @@
-// Filename: aes_encrypt
+// Filename: aes_encrypt.sv
 //
 // Copyright (c) 2013, Intel Corporation
 // All rights reserved
