@@ -21,10 +21,10 @@ void aes_encrypt_dpi(svBitVecVal * ct, svBitVecVal * key, int Nk, svBitVecVal * 
 
     // Number of 32-bit words comprising the Cipher Key.
     // For this standard, Nk = 4, 6, or 8. (Sec 6.3)
-    bp = key;
+    bp = (byte_t *) key;
     for (i = 0; i < 4*Nk; i++) KEY[i] = *bp++;
 
-    bp = pt;
+    bp = (byte_t *) pt;
     for (i = 0; i < 16; i++) PT[i] = *bp++;
 
     KeyExpansion(KEY, RKEY, Nk);
@@ -47,10 +47,10 @@ void aes_decrypt_dpi(svBitVecVal * pt, svBitVecVal * key, int Nk, svBitVecVal * 
 
     // Number of 32-bit words comprising the Cipher Key.
     // For this standard, Nk = 4, 6, or 8. (Sec 6.3)
-    bp = key;
+    bp = (byte_t *) key;
     for (i = 0; i < 4*Nk; i++) KEY[i] = *bp++;
 
-    bp = ct;
+    bp = (byte_t *) ct;
     for (i = 0; i < 16; i++) CT[i] = *bp++;
 
     KeyExpansion(KEY, RKEY, Nk);
