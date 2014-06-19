@@ -316,7 +316,7 @@ KeyExpansion(int Nk, word_t *rkey, word_t *key)
 ** len(rkey) = Nb*(Nr+1)
 */
 void
-Cipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
+Cipher(int Nk, byte_t ct[4*Nb], byte_t pt[4*Nb], word_t * rkey)
 {
     int row, col, round = 0;
     int Nr = Nk + 6;
@@ -325,9 +325,9 @@ Cipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
     word_t *wp_state;
     word_t *wp_io;
 
-    // state = in
+    // state = pt
     wp_state = (word_t *) state;
-    wp_io = (word_t *) in;
+    wp_io = (word_t *) pt;
     for(col = 0; col < Nb; col++)
         *wp_state++ = *wp_io++;
 
@@ -343,8 +343,8 @@ Cipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
     ShiftRows(state);
     AddRoundKey(state, rkey, Nr);
 
-    // out = state
-    wp_io = (word_t *) out;
+    // ct = state
+    wp_io = (word_t *) ct;
     wp_state = (word_t *) state;
     for(col = 0; col < Nb; col++)
         *wp_io++ = *wp_state++;
@@ -358,7 +358,7 @@ Cipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
 ** len(rkey) = Nb*(Nr+1)
 */
 void
-InvCipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
+InvCipher(int Nk, byte_t pt[4*Nb], byte_t ct[4*Nb], word_t * rkey)
 {
     int row, col, round = 0;
     int Nr = Nk + 6;
@@ -367,9 +367,9 @@ InvCipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
     word_t *wp_state;
     word_t *wp_io;
 
-    // state = in
+    // state = ct
     wp_state = (word_t *) state;
-    wp_io = (word_t *) in;
+    wp_io = (word_t *) ct;
     for (col = 0; col < Nb; col++)
         *wp_state++ = *wp_io++;
 
@@ -385,8 +385,8 @@ InvCipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
     InvSubBytes(state);
     AddRoundKey(state, rkey, 0);
 
-    // out = state
-    wp_io = (word_t *) out;
+    // pt = state
+    wp_io = (word_t *) pt;
     wp_state = (word_t *) state;
     for (col = 0; col < Nb; col++)
         *wp_io++ = *wp_state++;
