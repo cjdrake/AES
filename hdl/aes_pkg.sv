@@ -98,7 +98,7 @@ RotWord(logic [3:0] [7:0] w);
 endfunction
 
 function automatic logic [127:0]
-AddRoundKey(logic [3:0] [31:0] state, logic [31:0] rkey [4]);
+AddRoundKey(logic [3:0] [31:0] state, logic [3:0] [31:0] rkey);
     return {
         state[3] ^ rkey[3],
         state[2] ^ rkey[2],
