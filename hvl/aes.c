@@ -1,9 +1,11 @@
-// Filename: aes.c
-//
-// Copyright (c) 2013, Intel Corporation
-// All rights reserved
-//
-// Reference: http://www.csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+/*
+** Filename: aes.c
+**
+** Copyright (c) 2013, Intel Corporation
+** All rights reserved
+**
+** Reference: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+*/
 
 #include "aes.h"
 
@@ -80,70 +82,47 @@ static byte_t rcon[255] = {
     0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb
 };
 
-//=============================================================================
-// SubWord
-//=============================================================================
-
-word_t SubWord(word_t in)
+/*
+** Apply an S-box to each byte of *word*.
+*/
+static inline word_t
+SubWord(word_t word)
 {
     int i;
     word_t out;
 
-    byte_t *bp_in  = (byte_t *) &in;
+    byte_t *bp_in  = (byte_t *) &word;
     byte_t *bp_out = (byte_t *) &out;
 
-    for (i = 0; i < BYTES_PER_WORD; i++)
-        *bp_out++ = sbox[*bp_in++];
+    //for (i = 0; i < sizeof(word_t); i++)
+    //    *bp_out++ = sbox[*bp_in++];
+
+    bp_out[0] = sbox[bp_in[0]];
+    bp_out[1] = sbox[bp_in[1]];
+    bp_out[2] = sbox[bp_in[2]];
+    bp_out[3] = sbox[bp_in[3]];
 
     return out;
 }
 
-//=============================================================================
-// RotWord
-//=============================================================================
-
-inline word_t RotWord(word_t w)
+/*
+** Rotate the lower byte of *word* into the upper byte.
+*/
+static inline word_t
+RotWord(word_t word)
 {
-    return ((w & BYTE_MASK) << 3*BITS_PER_BYTE) | (w >> BITS_PER_BYTE);
+    return ((word & 0xff) << 3*8) | (word >> 8);
 }
 
-//=============================================================================
-// KeyExpansion
-//
-// len(key)  = 4*Nk
-// len(rkey) = Nb*(Nr+1)
-//=============================================================================
-
-void KeyExpansion(word_t *key, word_t *rkey, int Nk)
-{
-    int i;
-    int Nr = Nk + 6;
-    word_t temp;
-
-    word_t *wp_key = key;
-    word_t *wp_rkey = rkey;
-
-    for (i = 0; i < Nk; i++)
-        *wp_rkey++ = *wp_key++;
-
-    for (i = Nk; i < (Nb * (Nr + 1)); i++)
-    {
-        temp = rkey[i-1];
-        if (i % Nk == 0)
-            temp = SubWord(RotWord(temp)) ^ rcon[i/Nk];
-        else if (Nk > 6 && i % Nk == 4)
-            temp = SubWord(temp);
-        rkey[i] = rkey[i-Nk] ^ temp;
-    }
-}
-
-//=============================================================================
-// AddRoundKey
-//
-// len(rkey) = Nb*(Nr+1)
-//=============================================================================
-
-inline void AddRoundKey(byte_t state[Nb][4], word_t * rkey, int round)
+/*
+** Add (using XOR) a round key to *state*.
+**
+** See section 5.1.4
+**
+** len(rkey) = Nb*(Nr+1)
+*/
+static inline void
+AddRoundKey(byte_t state[Nb][4], word_t * rkey, int round)
 {
     int col;
     word_t *wp_state = (word_t *) state;
@@ -153,11 +132,13 @@ inline void AddRoundKey(byte_t state[Nb][4], word_t * rkey, int round)
         *wp_state++ ^= *wp_rkey++;
 }
 
-//=============================================================================
-// SubBytes
-//=============================================================================
-
-inline void SubBytes(byte_t state[Nb][4])
+/*
+** Apply S-box transformation to each word of *state*.
+**
+** See section 5.1.1
+*/
+static inline void
+SubBytes(byte_t state[Nb][4])
 {
     int row, col;
     for (col = 0; col < Nb; col++)
@@ -165,11 +146,13 @@ inline void SubBytes(byte_t state[Nb][4])
         state[col][row] = sbox[state[col][row]];
 }
 
-//=============================================================================
-// InvSubBytes
-//=============================================================================
-
-inline void InvSubBytes(byte_t state[Nb][4])
+/*
+** Inverse of SubBytes() operation
+**
+** See section 5.3.2
+*/
+static inline void
+InvSubBytes(byte_t state[Nb][4])
 {
     int row, col;
     for (col = 0; col < Nb; col++)
@@ -177,11 +160,13 @@ inline void InvSubBytes(byte_t state[Nb][4])
         state[col][row] = isbox[state[col][row]];
 }
 
-//=============================================================================
-// ShiftRows
-//=============================================================================
-
-inline void ShiftRows(byte_t state[Nb][4])
+/*
+** Cyclically shift the last three rows of *state* by different offsets.
+**
+** See section 5.1.2
+*/
+static inline void
+ShiftRows(byte_t state[Nb][4])
 {
     byte_t temp;
 
@@ -205,11 +190,13 @@ inline void ShiftRows(byte_t state[Nb][4])
     state[1][3] = temp;
 }
 
-//=============================================================================
-// InvShiftRows
-//=============================================================================
-
-inline void InvShiftRows(byte_t state[Nb][4])
+/*
+** Inverse of ShiftRows() operation
+**
+** See section 5.3.1
+*/
+static inline void
+InvShiftRows(byte_t state[Nb][4])
 {
     byte_t temp;
 
@@ -233,59 +220,103 @@ inline void InvShiftRows(byte_t state[Nb][4])
     state[3][3] = temp;
 }
 
-//=============================================================================
-// MixColumns
-//=============================================================================
+#define _MULT(C0, C1, C2, C3) \
+    Multiply(s0, C0) ^ Multiply(s1, C1) ^ Multiply(s2, C2) ^ Multiply(s3, C3)
 
-void MixColumns(byte_t state[Nb][4])
+/*
+** Mix the data of the *state* columns.
+**
+** See section 5.1.3
+*/
+static void
+MixColumns(byte_t state[Nb][4])
 {
     int i;
     byte_t s0, s1, s2, s3;
 
-    for(i = 0; i < 4; i++)
+    for(i = 0; i < Nb; i++)
     {
         s0 = state[i][0];
         s1 = state[i][1];
         s2 = state[i][2];
         s3 = state[i][3];
 
-        state[i][0] = Multiply(s0, 0x02) ^ Multiply(s1, 0x03) ^ Multiply(s2, 0x01) ^ Multiply(s3, 0x01);
-        state[i][1] = Multiply(s0, 0x01) ^ Multiply(s1, 0x02) ^ Multiply(s2, 0x03) ^ Multiply(s3, 0x01);
-        state[i][2] = Multiply(s0, 0x01) ^ Multiply(s1, 0x01) ^ Multiply(s2, 0x02) ^ Multiply(s3, 0x03);
-        state[i][3] = Multiply(s0, 0x03) ^ Multiply(s1, 0x01) ^ Multiply(s2, 0x01) ^ Multiply(s3, 0x02);
+        state[i][0] = _MULT(0x2, 0x3, 0x1, 0x1);
+        state[i][1] = _MULT(0x1, 0x2, 0x3, 0x1);
+        state[i][2] = _MULT(0x1, 0x1, 0x2, 0x3);
+        state[i][3] = _MULT(0x3, 0x1, 0x1, 0x2);
+
     }
 }
 
-//=============================================================================
-// InvMixColumns
-//=============================================================================
-
-void InvMixColumns(byte_t state[Nb][4])
+/*
+** Inverse of MixColumns() operation
+**
+** See section 5.3.3
+*/
+static void
+InvMixColumns(byte_t state[Nb][4])
 {
     int i;
     byte_t s0, s1, s2, s3;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < Nb; i++)
     {
         s0 = state[i][0];
         s1 = state[i][1];
         s2 = state[i][2];
         s3 = state[i][3];
 
-        state[i][0] = Multiply(s0, 0x0e) ^ Multiply(s1, 0x0b) ^ Multiply(s2, 0x0d) ^ Multiply(s3, 0x09);
-        state[i][1] = Multiply(s0, 0x09) ^ Multiply(s1, 0x0e) ^ Multiply(s2, 0x0b) ^ Multiply(s3, 0x0d);
-        state[i][2] = Multiply(s0, 0x0d) ^ Multiply(s1, 0x09) ^ Multiply(s2, 0x0e) ^ Multiply(s3, 0x0b);
-        state[i][3] = Multiply(s0, 0x0b) ^ Multiply(s1, 0x0d) ^ Multiply(s2, 0x09) ^ Multiply(s3, 0x0e);
+        state[i][0] = _MULT(0xe, 0xb, 0xd, 0x9);
+        state[i][1] = _MULT(0x9, 0xe, 0xb, 0xd);
+        state[i][2] = _MULT(0xd, 0x9, 0xe, 0xb);
+        state[i][3] = _MULT(0xb, 0xd, 0x9, 0xe);
     }
 }
 
-//=============================================================================
-// Cipher
-//
-// len(rkey) = Nb*(Nr+1)
-//=============================================================================
+#undef _MULT
 
-void Cipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
+/*
+** Generate a round key schedule from *key*.
+**
+** See section 5.2
+**
+** len(key)  = 4*Nk
+** len(rkey) = Nb*(Nr+1)
+*/
+void
+KeyExpansion(word_t *key, word_t *rkey, int Nk)
+{
+    int i;
+    int Nr = Nk + 6;
+    word_t temp;
+
+    word_t *wp_key = key;
+    word_t *wp_rkey = rkey;
+
+    for (i = 0; i < Nk; i++)
+        *wp_rkey++ = *wp_key++;
+
+    for (i = Nk; i < (Nb * (Nr + 1)); i++)
+    {
+        temp = rkey[i-1];
+        if (i % Nk == 0)
+            temp = SubWord(RotWord(temp)) ^ rcon[i/Nk];
+        else if (Nk > 6 && i % Nk == 4)
+            temp = SubWord(temp);
+        rkey[i] = rkey[i-Nk] ^ temp;
+    }
+}
+
+/*
+** AES cipher transformation
+**
+** See section 5.1
+**
+** len(rkey) = Nb*(Nr+1)
+*/
+void
+Cipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
 {
     int row, col, round = 0;
     int Nr = Nk + 6;
@@ -319,13 +350,15 @@ void Cipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
         *wp_io++ = *wp_state++;
 }
 
-//=============================================================================
-// InvCipher
-//
-// len(rkey) = Nb*(Nr+1)
-//=============================================================================
-
-void InvCipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
+/*
+** Inverse of Cipher() operation
+**
+** See section 5.3
+**
+** len(rkey) = Nb*(Nr+1)
+*/
+void
+InvCipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
 {
     int row, col, round = 0;
     int Nr = Nk + 6;
