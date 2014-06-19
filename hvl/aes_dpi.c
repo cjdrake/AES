@@ -14,7 +14,7 @@ aes_encrypt_dpi(int Nk, svBitVecVal * bv_ct, svBitVecVal * bv_pt, svBitVecVal * 
     int i;
 
     word_t key[8];
-    byte_t rkey[240];
+    word_t rkey[60];
     byte_t pt[16], ct[16];
 
     byte_t * bp;
@@ -41,7 +41,7 @@ aes_decrypt_dpi(int Nk, svBitVecVal * bv_pt, svBitVecVal * bv_ct, svBitVecVal * 
     int i;
 
     word_t key[8];
-    byte_t rkey[240];
+    word_t rkey[60];
     byte_t pt[16], ct[16];
 
     byte_t * bp;
