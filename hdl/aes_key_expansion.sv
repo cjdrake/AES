@@ -22,26 +22,26 @@ import aes_pkg::*;
 logic [31:0] rkey_i [4*(Nr+1)];
 
 generate
-    for (genvar gi = 0; gi < Nk; gi++) begin
+    for (genvar i = 0; i < Nk; i++) begin
         always_comb
-            rkey_i[gi] = key[32*gi+:32];
+            rkey_i[i] = key[32*i+:32];
     end
 
-    for (genvar gi = Nk; gi < 4*(Nr+1); gi++) begin
-        if (gi % Nk == 0)
+    for (genvar i = Nk; i < 4*(Nr+1); i++) begin
+        if (i % Nk == 0)
             always_comb
-                rkey_i[gi] = rkey_i[gi-Nk]
-                           ^ SubWord(RotWord(rkey_i[gi-1])) ^ RCON[gi/Nk];
-        else if (Nk > 6 && (gi % Nk == 4))
+                rkey_i[i] = rkey_i[i-Nk]
+                           ^ SubWord(RotWord(rkey_i[i-1])) ^ RCON[i/Nk];
+        else if (Nk > 6 && (i % Nk == 4))
             always_comb
-                rkey_i[gi] = rkey_i[gi-Nk] ^ SubWord(rkey_i[gi-1]);
+                rkey_i[i] = rkey_i[i-Nk] ^ SubWord(rkey_i[i-1]);
         else
             always_comb
-                rkey_i[gi] = rkey_i[gi-Nk] ^ rkey_i[gi-1];
+                rkey_i[i] = rkey_i[i-Nk] ^ rkey_i[i-1];
     end
 
-    for (genvar gi = 0; gi < 4*(Nr+1); gi++) begin
-        `DFFEN(rkey[gi], rkey_i[gi], load, clk)
+    for (genvar i = 0; i < 4*(Nr+1); i++) begin
+        `DFFEN(rkey[i], rkey_i[i], load, clk)
     end
 endgenerate
 

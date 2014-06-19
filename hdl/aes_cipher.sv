@@ -32,11 +32,11 @@ always_comb ct = state[Nr];
 `DFFEN(state[0], AddRoundKey(pt, rkey[0:3]), valid[0], clk)
 
 generate
-    for (genvar gi = 1; gi < Nr; gi++) begin: round
-        always_comb s_box[gi] = SubBytes(state[gi-1]);
-        always_comb s_row[gi] = ShiftRows(s_box[gi]);
-        always_comb m_col[gi] = MixColumns(s_row[gi]);
-        `DFFEN(state[gi], AddRoundKey(m_col[gi], rkey[4*gi+:4]), valid[gi], clk)
+    for (genvar i = 1; i < Nr; i++) begin: round
+        always_comb s_box[i] = SubBytes(state[i-1]);
+        always_comb s_row[i] = ShiftRows(s_box[i]);
+        always_comb m_col[i] = MixColumns(s_row[i]);
+        `DFFEN(state[i], AddRoundKey(m_col[i], rkey[4*i+:4]), valid[i], clk)
     end: round
 endgenerate
 

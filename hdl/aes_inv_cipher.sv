@@ -32,11 +32,11 @@ always_comb pt = istate[0];
 `DFFEN(istate[Nr], AddRoundKey(ct, rkey[4*Nr+:4]), valid[Nr], clk)
 
 generate
-    for (genvar gi = (Nr-1); gi > 0; gi--) begin: round
-        always_comb is_row[gi] = InvShiftRows(istate[gi+1]);
-        always_comb is_box[gi] = InvSubBytes(is_row[gi]);
-        always_comb ik_add[gi] = AddRoundKey(is_box[gi], rkey[4*gi+:4]);
-        `DFFEN(istate[gi], InvMixColumns(ik_add[gi]), valid[gi], clk)
+    for (genvar i = (Nr-1); i > 0; i--) begin: round
+        always_comb is_row[i] = InvShiftRows(istate[i+1]);
+        always_comb is_box[i] = InvSubBytes(is_row[i]);
+        always_comb ik_add[i] = AddRoundKey(is_box[i], rkey[4*i+:4]);
+        `DFFEN(istate[i], InvMixColumns(ik_add[i]), valid[i], clk)
     end: round
 endgenerate
 

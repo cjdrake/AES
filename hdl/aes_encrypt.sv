@@ -28,8 +28,8 @@ logic [31:0] rkey [4*(Nr+1)];
 `DFF_ARN(valid[0], load, clk, rst_b, 1'b0)
 
 generate
-    for (genvar gi = 1; gi <= Nr; gi++) begin
-        `DFF_ARN(valid[gi], valid[gi-1], clk, rst_b, 1'b0)
+    for (genvar i = 1; i <= Nr; i++) begin
+        `DFF_ARN(valid[i], valid[i-1], clk, rst_b, 1'b0)
     end
 endgenerate
 
