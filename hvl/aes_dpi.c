@@ -9,19 +9,22 @@
 #include "aes.h"
 
 void
-aes_encrypt_dpi(int Nk, svBitVecVal * bv_ct, svBitVecVal * bv_pt, svBitVecVal * bv_key)
+aes_encrypt_dpi(
+    int Nk, // {4, 6, 8}
+    svBitVecVal * bv_ct, // output bit [127:0] ct
+    svBitVecVal * bv_pt, // input  bit [127:0] pt
+    svBitVecVal * bv_key // input  bit [255:0] key
+    )
 {
     int i;
 
-    word_t key[8];
-    word_t rkey[60];
+    word_t key[8]; // Nk
+    word_t rkey[Nb*(8+6+1)]; // Nb*(Nk+6+1)
     byte_t pt[16], ct[16];
 
     byte_t * bp;
     word_t * wp;
 
-    // Number of 32-bit words comprising the Cipher Key.
-    // For this standard, Nk = 4, 6, or 8. (Sec 6.3)
     wp = (word_t *) bv_key;
     for (i = 0; i < Nk; i++) key[i] = *wp++;
 
@@ -36,19 +39,22 @@ aes_encrypt_dpi(int Nk, svBitVecVal * bv_ct, svBitVecVal * bv_pt, svBitVecVal * 
 }
 
 void
-aes_decrypt_dpi(int Nk, svBitVecVal * bv_pt, svBitVecVal * bv_ct, svBitVecVal * bv_key)
+aes_decrypt_dpi(
+    int Nk, // {4, 6, 8}
+    svBitVecVal * bv_pt, // output bit [127:0] pt
+    svBitVecVal * bv_ct, // input  bit [127:0] ct
+    svBitVecVal * bv_key // input  bit [255:0] key
+    )
 {
     int i;
 
-    word_t key[8];
-    word_t rkey[60];
+    word_t key[8]; // Nk
+    word_t rkey[Nb*(8+6+1)]; // Nb*(Nk+6+1)
     byte_t pt[16], ct[16];
 
     byte_t * bp;
     word_t * wp;
 
-    // Number of 32-bit words comprising the Cipher Key.
-    // For this standard, Nk = 4, 6, or 8. (Sec 6.3)
     wp = (word_t *) bv_key;
     for (i = 0; i < Nk; i++) key[i] = *wp++;
 
