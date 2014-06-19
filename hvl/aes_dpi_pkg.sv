@@ -7,18 +7,18 @@ package aes_dpi_pkg;
 
     import "DPI" function void
     aes_encrypt_dpi(
+        input int Nk,
         output bit [127:0] ct,
-        input bit [255:0] key,
-        int Nk,
-        bit [127:0] pt
+        input bit [127:0] pt,
+        input bit [255:0] key
     );
 
     import "DPI" function void
     aes_decrypt_dpi(
+        input int Nk,
         output bit [127:0] pt,
-        input bit [255:0] key,
-        int Nk,
-        bit [127:0] ct
+        input bit [127:0] ct,
+        input bit [255:0] key
     );
 
 endpackage: aes_dpi_pkg

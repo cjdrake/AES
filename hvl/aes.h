@@ -34,8 +34,8 @@
 typedef uint32_t word_t;
 typedef uint8_t  byte_t;
 
-void KeyExpansion(word_t *key, word_t *rkey, int Nk);
-void Cipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk);
-void InvCipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk);
+void KeyExpansion(int Nk, word_t *rkey, word_t *key);
+void Cipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey);
+void InvCipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey);
 
 #endif // AES_H

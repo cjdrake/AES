@@ -285,7 +285,7 @@ InvMixColumns(byte_t state[Nb][4])
 ** len(rkey) = Nb*(Nr+1)
 */
 void
-KeyExpansion(word_t *key, word_t *rkey, int Nk)
+KeyExpansion(int Nk, word_t *rkey, word_t *key)
 {
     int i;
     int Nr = Nk + 6;
@@ -316,7 +316,7 @@ KeyExpansion(word_t *key, word_t *rkey, int Nk)
 ** len(rkey) = Nb*(Nr+1)
 */
 void
-Cipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
+Cipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
 {
     int row, col, round = 0;
     int Nr = Nk + 6;
@@ -358,7 +358,7 @@ Cipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
 ** len(rkey) = Nb*(Nr+1)
 */
 void
-InvCipher(byte_t in[4*Nb], byte_t out[4*Nb], word_t * rkey, int Nk)
+InvCipher(int Nk, byte_t out[4*Nb], byte_t in[4*Nb], word_t * rkey)
 {
     int row, col, round = 0;
     int Nr = Nk + 6;

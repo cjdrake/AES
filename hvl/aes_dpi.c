@@ -8,7 +8,8 @@
 
 #include "aes.h"
 
-void aes_encrypt_dpi(svBitVecVal * ct, svBitVecVal * key, int Nk, svBitVecVal * pt)
+void
+aes_encrypt_dpi(int Nk, svBitVecVal * ct, svBitVecVal * pt, svBitVecVal * key)
 {
     int i;
 
@@ -27,14 +28,15 @@ void aes_encrypt_dpi(svBitVecVal * ct, svBitVecVal * key, int Nk, svBitVecVal * 
     bp = (byte_t *) pt;
     for (i = 0; i < 16; i++) PT[i] = *bp++;
 
-    KeyExpansion(KEY, RKEY, Nk);
-    Cipher(PT, CT, RKEY, Nk);
+    KeyExpansion(Nk, RKEY, KEY);
+    Cipher(Nk, CT, PT, RKEY);
 
     wp = (word_t *) CT;
     for (i = 0; i < 4; i++) ct[i] = *wp++;
 }
 
-void aes_decrypt_dpi(svBitVecVal * pt, svBitVecVal * key, int Nk, svBitVecVal * ct)
+void
+aes_decrypt_dpi(int Nk, svBitVecVal * pt, svBitVecVal * ct, svBitVecVal * key)
 {
     int i;
 
@@ -53,8 +55,8 @@ void aes_decrypt_dpi(svBitVecVal * pt, svBitVecVal * key, int Nk, svBitVecVal * 
     bp = (byte_t *) ct;
     for (i = 0; i < 16; i++) CT[i] = *bp++;
 
-    KeyExpansion(KEY, RKEY, Nk);
-    InvCipher(CT, PT, RKEY, Nk);
+    KeyExpansion(Nk, RKEY, KEY);
+    InvCipher(Nk, PT, CT, RKEY);
 
     wp = (word_t *) PT;
     for (i = 0; i < 4; i++) pt[i] = *wp++;

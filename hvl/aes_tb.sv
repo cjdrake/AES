@@ -44,7 +44,7 @@ initial begin: testbench
                 key[32*j+:32] = $random();
             for (int j = 0; j < 4; j++)
                 pt[32*j+:32] = $random();
-            aes_encrypt_dpi(ct, key, Nk, pt);
+            aes_encrypt_dpi(Nk, ct, pt, key);
 
             @(posedge clk) #1;
             load[Nk/2-2] = 1'b0;
