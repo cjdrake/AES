@@ -31,7 +31,8 @@ generate
         if (i % Nk == 0)
             always_comb
                 rkey_i[i] = rkey_i[i-Nk]
-                           ^ SubWord(RotWord(rkey_i[i-1])) ^ RCON[i/Nk];
+                           ^ SubWord(RotWord(rkey_i[i-1]))
+                           ^ {24'h0, RCON[i/Nk]};
         else if (Nk > 6 && (i % Nk == 4))
             always_comb
                 rkey_i[i] = rkey_i[i-Nk] ^ SubWord(rkey_i[i-1]);
@@ -39,7 +40,9 @@ generate
             always_comb
                 rkey_i[i] = rkey_i[i-Nk] ^ rkey_i[i-1];
     end
+endgenerate
 
+generate
     for (genvar i = 0; i < 4*(Nr+1); ++i) begin
         `DFFEN(rkey[i], rkey_i[i], load, clk)
     end
