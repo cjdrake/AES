@@ -43,8 +43,7 @@ initial begin: testbench
     @(posedge clk) #1 load[0] = 1'b1;
     @(posedge clk) #1 load[0] = 1'b0;
 
-    wait (ct_valid[0]) #1;
-    assert (ct_out[0] == ct);
+    wait (ct_valid[0]) #1 assert (ct_out[0] == ct);
 
     @(posedge clk) #1 load[0] = 1'b1;
     @(posedge clk) #1 load[0] = 1'b0;
