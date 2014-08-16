@@ -26,16 +26,16 @@ aes_encrypt_dpi(
     word_t * wp;
 
     wp = (word_t *) bv_key;
-    for (i = 0; i < Nk; i++) key[i] = *wp++;
+    for (i = 0; i < Nk; ++i) key[i] = *wp++;
 
     bp = (byte_t *) bv_pt;
-    for (i = 0; i < 16; i++) pt[i] = *bp++;
+    for (i = 0; i < 16; ++i) pt[i] = *bp++;
 
     KeyExpansion(Nk, rkey, key);
     Cipher(Nk, ct, pt, rkey);
 
     wp = (word_t *) ct;
-    for (i = 0; i < 4; i++) bv_ct[i] = *wp++;
+    for (i = 0; i < 4; ++i) bv_ct[i] = *wp++;
 }
 
 void
@@ -56,14 +56,14 @@ aes_decrypt_dpi(
     word_t * wp;
 
     wp = (word_t *) bv_key;
-    for (i = 0; i < Nk; i++) key[i] = *wp++;
+    for (i = 0; i < Nk; ++i) key[i] = *wp++;
 
     bp = (byte_t *) bv_ct;
-    for (i = 0; i < 16; i++) ct[i] = *bp++;
+    for (i = 0; i < 16; ++i) ct[i] = *bp++;
 
     KeyExpansion(Nk, rkey, key);
     InvCipher(Nk, pt, ct, rkey);
 
     wp = (word_t *) pt;
-    for (i = 0; i < 4; i++) bv_pt[i] = *wp++;
+    for (i = 0; i < 4; ++i) bv_pt[i] = *wp++;
 }

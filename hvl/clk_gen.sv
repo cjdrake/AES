@@ -3,9 +3,11 @@
 // Copyright (c) 2013, Intel Corporation
 // All rights reserved
 
-module clk_gen #(int period = 2500,
-                 int phase_shift = 20)
-(
+module clk_gen
+#(
+    int period = 2500,
+    int phase_shift = 20
+)(
     output bit clk
 );
 

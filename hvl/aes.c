@@ -94,9 +94,6 @@ SubWord(word_t word)
     byte_t *bp_in  = (byte_t *) &word;
     byte_t *bp_out = (byte_t *) &out;
 
-    //for (i = 0; i < sizeof(word_t); i++)
-    //    *bp_out++ = sbox[*bp_in++];
-
     bp_out[0] = sbox[bp_in[0]];
     bp_out[1] = sbox[bp_in[1]];
     bp_out[2] = sbox[bp_in[2]];
@@ -128,7 +125,7 @@ AddRoundKey(byte_t state[Nb][4], word_t * rkey, int round)
     word_t *wp_state = (word_t *) state;
     word_t *wp_rkey = rkey + (Nb * round);
 
-    for (col = 0; col < Nb; col++)
+    for (col = 0; col < Nb; ++col)
         *wp_state++ ^= *wp_rkey++;
 }
 
@@ -141,8 +138,8 @@ static inline void
 SubBytes(byte_t state[Nb][4])
 {
     int row, col;
-    for (col = 0; col < Nb; col++)
-    for (row = 0; row < 4;  row++)
+    for (col = 0; col < Nb; ++col)
+    for (row = 0; row < 4;  ++row)
         state[col][row] = sbox[state[col][row]];
 }
 
@@ -155,8 +152,8 @@ static inline void
 InvSubBytes(byte_t state[Nb][4])
 {
     int row, col;
-    for (col = 0; col < Nb; col++)
-    for (row = 0; row < 4;  row++)
+    for (col = 0; col < Nb; ++col)
+    for (row = 0; row < 4;  ++row)
         state[col][row] = isbox[state[col][row]];
 }
 
@@ -234,7 +231,7 @@ MixColumns(byte_t state[Nb][4])
     int i;
     byte_t s0, s1, s2, s3;
 
-    for(i = 0; i < Nb; i++)
+    for(i = 0; i < Nb; ++i)
     {
         s0 = state[i][0];
         s1 = state[i][1];
@@ -245,7 +242,6 @@ MixColumns(byte_t state[Nb][4])
         state[i][1] = _MULT(0x1, 0x2, 0x3, 0x1);
         state[i][2] = _MULT(0x1, 0x1, 0x2, 0x3);
         state[i][3] = _MULT(0x3, 0x1, 0x1, 0x2);
-
     }
 }
 
@@ -260,7 +256,7 @@ InvMixColumns(byte_t state[Nb][4])
     int i;
     byte_t s0, s1, s2, s3;
 
-    for (i = 0; i < Nb; i++)
+    for (i = 0; i < Nb; ++i)
     {
         s0 = state[i][0];
         s1 = state[i][1];
@@ -294,10 +290,10 @@ KeyExpansion(int Nk, word_t *rkey, word_t *key)
     word_t *wp_key = key;
     word_t *wp_rkey = rkey;
 
-    for (i = 0; i < Nk; i++)
+    for (i = 0; i < Nk; ++i)
         *wp_rkey++ = *wp_key++;
 
-    for (i = Nk; i < (Nb * (Nr + 1)); i++)
+    for (i = Nk; i < (Nb * (Nr + 1)); ++i)
     {
         temp = rkey[i-1];
         if (i % Nk == 0)
@@ -328,11 +324,11 @@ Cipher(int Nk, byte_t ct[4*Nb], byte_t pt[4*Nb], word_t * rkey)
     // state = pt
     wp_state = (word_t *) state;
     wp_io = (word_t *) pt;
-    for(col = 0; col < Nb; col++)
+    for(col = 0; col < Nb; ++col)
         *wp_state++ = *wp_io++;
 
     AddRoundKey(state, rkey, 0);
-    for(round = 1; round < Nr; round++)
+    for(round = 1; round < Nr; ++round)
     {
         SubBytes(state);
         ShiftRows(state);
@@ -346,7 +342,7 @@ Cipher(int Nk, byte_t ct[4*Nb], byte_t pt[4*Nb], word_t * rkey)
     // ct = state
     wp_io = (word_t *) ct;
     wp_state = (word_t *) state;
-    for(col = 0; col < Nb; col++)
+    for(col = 0; col < Nb; ++col)
         *wp_io++ = *wp_state++;
 }
 
@@ -370,11 +366,11 @@ InvCipher(int Nk, byte_t pt[4*Nb], byte_t ct[4*Nb], word_t * rkey)
     // state = ct
     wp_state = (word_t *) state;
     wp_io = (word_t *) ct;
-    for (col = 0; col < Nb; col++)
+    for (col = 0; col < Nb; ++col)
         *wp_state++ = *wp_io++;
 
     AddRoundKey(state, rkey, Nr);
-    for (round = Nr - 1; round > 0; round--)
+    for (round = Nr - 1; round > 0; --round)
     {
         InvShiftRows(state);
         InvSubBytes(state);
@@ -388,6 +384,6 @@ InvCipher(int Nk, byte_t pt[4*Nb], byte_t ct[4*Nb], word_t * rkey)
     // pt = state
     wp_io = (word_t *) pt;
     wp_state = (word_t *) state;
-    for (col = 0; col < Nb; col++)
+    for (col = 0; col < Nb; ++col)
         *wp_io++ = *wp_state++;
 }

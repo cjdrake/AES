@@ -176,15 +176,15 @@ endfunction
 function automatic logic [7:0]
 RowXCol(bit [3:0] [3:0] row, logic [0:3] [7:0] col);
     RowXCol = 8'h0;
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
             if (row[i][j]) RowXCol ^= xtime(col[i], j);
 endfunction
 
 function automatic logic [7:0]
 xtime(logic [7:0] b, int n);
     xtime = b;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
         xtime = {xtime[6:0], 1'b0} ^ (8'h1b & {8{xtime[7]}});
 endfunction
 

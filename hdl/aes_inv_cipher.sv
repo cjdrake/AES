@@ -42,7 +42,7 @@ endgenerate
 `DFFEN(istate[Nr], AddRoundKey(ct, prkey[Nr]), valid[Nr], clk)
 
 generate
-    for (genvar i = (Nr-1); i > 0; i--) begin: round
+    for (genvar i = (Nr-1); i > 0; --i) begin: round
         always_comb is_row[i] = InvShiftRows(istate[i+1]);
         always_comb is_box[i] = InvSubBytes(is_row[i]);
         always_comb ik_add[i] = AddRoundKey(is_box[i], prkey[i]);

@@ -22,12 +22,12 @@ import aes_pkg::*;
 logic [31:0] rkey_i [4*(Nr+1)];
 
 generate
-    for (genvar i = 0; i < Nk; i++) begin
+    for (genvar i = 0; i < Nk; ++i) begin
         always_comb
             rkey_i[i] = key[32*i+:32];
     end
 
-    for (genvar i = Nk; i < 4*(Nr+1); i++) begin
+    for (genvar i = Nk; i < 4*(Nr+1); ++i) begin
         if (i % Nk == 0)
             always_comb
                 rkey_i[i] = rkey_i[i-Nk]
@@ -40,7 +40,7 @@ generate
                 rkey_i[i] = rkey_i[i-Nk] ^ rkey_i[i-1];
     end
 
-    for (genvar i = 0; i < 4*(Nr+1); i++) begin
+    for (genvar i = 0; i < 4*(Nr+1); ++i) begin
         `DFFEN(rkey[i], rkey_i[i], load, clk)
     end
 endgenerate

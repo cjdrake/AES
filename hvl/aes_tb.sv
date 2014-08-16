@@ -83,10 +83,10 @@ initial begin: testbench
 
     for (int Nk = 4; Nk <= 8; Nk += 2) begin
         $display("testing AES-%0d", 32*Nk);
-        for (int i = 0; i < NUM_TEST_VECS; i++) begin
-            for (int j = 0; j < Nk; j++)
+        for (int i = 0; i < NUM_TEST_VECS; ++i) begin
+            for (int j = 0; j < Nk; ++j)
                 key[32*j+:32] = $random();
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 4; ++j)
                 pt[32*j+:32] = $random();
             aes_encrypt_dpi(Nk, ct, pt, key);
 
