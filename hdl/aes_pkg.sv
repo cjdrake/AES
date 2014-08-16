@@ -174,11 +174,11 @@ Multiply(bit [15:0] a [4], logic [31:0] col);
 endfunction
 
 function automatic logic [7:0]
-RowXCol(bit [3:0] [3:0] row, logic [0:3] [7:0] col);
+RowXCol(bit [3:0] [3:0] row, logic [3:0] [7:0] col);
     RowXCol = 8'h0;
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 4; ++j)
-            if (row[i][j]) RowXCol ^= xtime(col[i], j);
+            if (row[i][j]) RowXCol ^= xtime(col[3-i], j);
 endfunction
 
 function automatic logic [7:0]
