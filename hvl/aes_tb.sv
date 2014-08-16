@@ -28,37 +28,77 @@ clk_gen clocks(.*);
 
 initial begin: testbench
 
+    // Reset DUT
     @(posedge clk) #1;
     rst_b = 1'b0;
     repeat(4) @(posedge clk) #1;
     rst_b = 1'b1;
     repeat(4) @(posedge clk) #1;
 
+    // C.1 AES-128 example vector
+    key = 128'h0f0e0d0c0b0a09080706050403020100;
+    pt  = 128'hffeeddccbbaa99887766554433221100;
+    ct  = 128'h5ac5b47080b7cdd830047b6ad8e0c469;
+
+    @(posedge clk) #1 load[0] = 1'b1;
+    @(posedge clk) #1 load[0] = 1'b0;
+
+    wait (ct_valid[0]) #1;
+    assert (ct_out[0] == ct);
+
+    @(posedge clk) #1 load[0] = 1'b1;
+    @(posedge clk) #1 load[0] = 1'b0;
+
+    wait (pt_valid[0]) #1 assert (pt_out[0] == pt);
+
+    // C.2 AES-192 example vector
+    key = 192'h17161514131211100f0e0d0c0b0a09080706050403020100;
+    pt  = 128'hffeeddccbbaa99887766554433221100;
+    ct  = 128'h91710deca070af6ee0df4c86a47ca9dd;
+
+    @(posedge clk) #1 load[1] = 1'b1;
+    @(posedge clk) #1 load[1] = 1'b0;
+
+    wait (ct_valid[1]) #1 assert (ct_out[1] == ct);
+
+    @(posedge clk) #1 load[1] = 1'b1;
+    @(posedge clk) #1 load[1] = 1'b0;
+
+    wait (pt_valid[1]) #1 assert (pt_out[1] == pt);
+
+    // C.3 AES-256 example vector
+    key = 256'h1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100;
+    pt  = 128'hffeeddccbbaa99887766554433221100;
+    ct  = 128'h8960494b9049fceabf456751cab7a28e;
+
+    @(posedge clk) #1 load[2] = 1'b1;
+    @(posedge clk) #1 load[2] = 1'b0;
+
+    wait (ct_valid[2]) #1 assert (ct_out[2] == ct);
+
+    @(posedge clk) #1 load[2] = 1'b1;
+    @(posedge clk) #1 load[2] = 1'b0;
+
+    wait (pt_valid[2]) #1 assert (pt_out[2] == pt);
+
     for (int Nk = 4; Nk <= 8; Nk += 2) begin
         $display("testing AES-%0d", 32*Nk);
         for (int i = 0; i < NUM_TEST_VECS; i++) begin
-            @(posedge clk) #1;
-            load[Nk/2-2] = 1'b1;
-
             for (int j = 0; j < Nk; j++)
                 key[32*j+:32] = $random();
             for (int j = 0; j < 4; j++)
                 pt[32*j+:32] = $random();
             aes_encrypt_dpi(Nk, ct, pt, key);
 
-            @(posedge clk) #1;
-            load[Nk/2-2] = 1'b0;
+            @(posedge clk) #1 load[Nk/2-2] = 1'b1;
+            @(posedge clk) #1 load[Nk/2-2] = 1'b0;
 
-            wait (ct_valid[Nk/2-2]) #1;
-            assert (ct == ct_out[Nk/2-2]);
+            wait (ct_valid[Nk/2-2]) #1 assert (ct_out[Nk/2-2] == ct);
 
-            @(posedge clk) #1;
-            load[Nk/2-2] = 1'b1;
-            @(posedge clk) #1;
-            load[Nk/2-2] = 1'b0;
+            @(posedge clk) #1 load[Nk/2-2] = 1'b1;
+            @(posedge clk) #1 load[Nk/2-2] = 1'b0;
 
-            wait (pt_valid[Nk/2-2]) #1;
-            assert (pt == pt_out[Nk/2-2]);
+            wait (pt_valid[Nk/2-2]) #1 assert (pt_out[Nk/2-2] == pt);
         end
     end
 
