@@ -144,7 +144,7 @@ InvShiftRows(logic [3:0] [3:0] [7:0] state);
 endfunction
 
 function automatic logic [127:0]
-MixColumns(logic [3:0] [3:0] [7:0] state);
+MixColumns(logic [3:0] [31:0] state);
     return {
         Multiply(MA, state[3]),
         Multiply(MA, state[2]),
@@ -154,7 +154,7 @@ MixColumns(logic [3:0] [3:0] [7:0] state);
 endfunction
 
 function automatic logic [127:0]
-InvMixColumns(logic [3:0] [3:0] [7:0] state);
+InvMixColumns(logic [3:0] [31:0] state);
     return {
         Multiply(IMA, state[3]),
         Multiply(IMA, state[2]),
@@ -164,7 +164,7 @@ InvMixColumns(logic [3:0] [3:0] [7:0] state);
 endfunction
 
 function automatic logic [31:0]
-Multiply(bit [3:0] [3:0] a [4], logic [0:3] [7:0] col);
+Multiply(bit [15:0] a [4], logic [31:0] col);
     return {
         RowXCol(a[3], col),
         RowXCol(a[2], col),
