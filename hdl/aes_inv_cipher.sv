@@ -32,7 +32,7 @@ always_comb pt = istate[0];
 
 // pack round keys
 generate
-    for (genvar i = 0; i <= Nr; ++i) begin
+    for (genvar i = 0; i <= Nr; ++i) begin: pack_rkey
         always_comb
             prkey[i] = {rkey[4*i+3], rkey[4*i+2], rkey[4*i+1], rkey[4*i+0]};
     end
