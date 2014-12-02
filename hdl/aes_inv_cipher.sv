@@ -7,8 +7,8 @@
 
 module aes_inv_cipher
 #(
-    parameter int Nk=4,
-    parameter int Nr=Nk+6
+    int Nk=4,
+    int Nr=Nk+6
 ) (
     input logic clk,
     input logic valid [0:Nr],
