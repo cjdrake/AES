@@ -7,8 +7,8 @@
 
 module aes_key_expansion
 #(
-    int Nk=4,
-    int Nr=Nk+6
+    parameter Nk=4,
+    parameter Nr=Nk+6
 ) (
     input logic clk,
     input logic load,
