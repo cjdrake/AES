@@ -88,7 +88,6 @@ static byte_t rcon[255] = {
 static inline word_t
 SubWord(word_t word)
 {
-    int i;
     word_t out;
 
     byte_t *bp_in  = (byte_t *) &word;
@@ -314,7 +313,7 @@ KeyExpansion(int Nk, word_t *rkey, word_t *key)
 void
 Cipher(int Nk, byte_t ct[4*Nb], byte_t pt[4*Nb], word_t * rkey)
 {
-    int row, col, round = 0;
+    int col, round = 0;
     int Nr = Nk + 6;
 
     byte_t state[Nb][4];
@@ -356,7 +355,7 @@ Cipher(int Nk, byte_t ct[4*Nb], byte_t pt[4*Nb], word_t * rkey)
 void
 InvCipher(int Nk, byte_t pt[4*Nb], byte_t ct[4*Nb], word_t * rkey)
 {
-    int row, col, round = 0;
+    int col, round = 0;
     int Nr = Nk + 6;
 
     byte_t state[Nb][4];
