@@ -4,7 +4,6 @@
 // All rights reserved
 
 #include <svdpi.h>
-#include <svdpi_src.h>
 
 #include "aes.h"
 

@@ -1,7 +1,3 @@
-This work is Copyright Intel Corporation, because Intel provides all the EDA
-licenses required to support the author's (unhealthy?) obsession with
-interesting digital logic.
-
-All code in this repository is intended for academic interest. No Intel product
-uses any of this code as the basis for an Advanced Encryption Standard
-implementation.
+All code in this repository is intended for academic interest.
+No Intel or Google product uses any of this code as the basis for an
+Advanced Encryption Standard implementation.

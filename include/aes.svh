@@ -1,9 +1,12 @@
-// Filename: aes_pkg.sv
+// Filename: aes.svh
 //
 // Copyright (c) 2013, Intel Corporation
 // All rights reserved
+//
+// Reference: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
 
-package aes_pkg;
+`ifndef AES_SV
+`define AES_SV
 
 const bit [7:0] SBOX [256] = '{
     8'h63, 8'h7c, 8'h77, 8'h7b, 8'hf2, 8'h6b, 8'h6f, 8'hc5, 8'h30, 8'h01, 8'h67, 8'h2b, 8'hfe, 8'hd7, 8'hab, 8'h76,
@@ -98,12 +101,12 @@ RotWord(logic [3:0] [7:0] w);
 endfunction
 
 function automatic logic [127:0]
-AddRoundKey(logic [3:0] [31:0] state, logic [3:0] [31:0] rkey);
+AddRoundKey(logic [3:0] [31:0] state, logic [3:0] [31:0] key);
     return {
-        state[3] ^ rkey[3],
-        state[2] ^ rkey[2],
-        state[1] ^ rkey[1],
-        state[0] ^ rkey[0]
+        state[3] ^ key[3],
+        state[2] ^ key[2],
+        state[1] ^ key[1],
+        state[0] ^ key[0]
     };
 endfunction
 
@@ -188,4 +191,4 @@ xtime(logic [7:0] b, int n);
         xtime = {xtime[6:0], 1'b0} ^ (8'h1b & {8{xtime[7]}});
 endfunction
 
-endpackage: aes_pkg
+`endif // AES_SV

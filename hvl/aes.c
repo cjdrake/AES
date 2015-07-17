@@ -230,7 +230,7 @@ MixColumns(byte_t state[Nb][4])
     int i;
     byte_t s0, s1, s2, s3;
 
-    for(i = 0; i < Nb; ++i)
+    for (i = 0; i < Nb; ++i)
     {
         s0 = state[i][0];
         s1 = state[i][1];
@@ -323,11 +323,11 @@ Cipher(int Nk, byte_t ct[4*Nb], byte_t pt[4*Nb], word_t * rkey)
     // state = pt
     wp_state = (word_t *) state;
     wp_io = (word_t *) pt;
-    for(col = 0; col < Nb; ++col)
+    for (col = 0; col < Nb; ++col)
         *wp_state++ = *wp_io++;
 
     AddRoundKey(state, rkey, 0);
-    for(round = 1; round < Nr; ++round)
+    for (round = 1; round < Nr; ++round)
     {
         SubBytes(state);
         ShiftRows(state);
@@ -341,7 +341,7 @@ Cipher(int Nk, byte_t ct[4*Nb], byte_t pt[4*Nb], word_t * rkey)
     // ct = state
     wp_io = (word_t *) ct;
     wp_state = (word_t *) state;
-    for(col = 0; col < Nb; ++col)
+    for (col = 0; col < Nb; ++col)
         *wp_io++ = *wp_state++;
 }
 

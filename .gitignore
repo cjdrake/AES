@@ -1,1 +1,22 @@
-sim
+# Filename: .gitignore
+
+# Cadence Incisive
+.simvision
+INCA_libs/
+INCA_libs.tar.gz
+irun.*.log
+irun.key
+params.sv
+params.sv.in
+waves.shm
+
+# Synopsys VCS
+DVEfiles/
+csrc/
+inter.vpd
+simv
+simv.daidir/
+simv.tar.gz
+ucli.key
+vc_hdrs.h
+vcs.*.log
