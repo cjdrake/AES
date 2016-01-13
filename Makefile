@@ -78,7 +78,7 @@ export INCA_64BIT := true
 IRUN := irun
 IRUN_ELAB_FLAGS := -access +rwc -incdir include -cflags '-Iinclude'
 IRUN_ELAB_FILES := $(VLOG_HDL_FILES) $(VLOG_HVL_FILES) $(C_FILES)
-IRUN_SIM_FLAGS := -licqueue -nowarn WSEM2009
+IRUN_SIM_FLAGS := -nowarn WSEM2009
 IRUN_SIM_CMD := irun-sim.cmd
 
 INCA_libs: $(SRC) params.sv
@@ -106,13 +106,13 @@ inca-gui: INCA_libs
 
 # Synopsys VCS targets
 VCS := vcs
-VCS_ELAB_FLAGS := -licqueue -debug_access+r -lca -sverilog +incdir+include -cflags '-I../include'
+VCS_ELAB_FLAGS := -debug_access+r -sverilog +incdir+include -cflags '-I../include'
 VCS_ELAB_FILES := $(VLOG_HDL_FILES) $(VLOG_HVL_FILES) $(C_FILES)
-VCS_SIM_FLAGS := -licqueue
+VCS_SIM_FLAGS :=
 VCS_SIM_CMD := vcs-sim.cmd
 
 simv simv.daidir: $(SRC) params.sv
-	$(VCS) -l vcs.elab.log $(VCS_ELAB_FLAGS) $(VCS_ELAB_FILES)
+	$(VCS) -full64 -l vcs.elab.log $(VCS_ELAB_FLAGS) $(VCS_ELAB_FILES)
 
 simv.tar.gz: simv simv.daidir
 	@printf "./simv -l vcs.sim.log +NUM_VECS=$(NUM_VECS) $(VCS_SIM_FLAGS)\n" > $(VCS_SIM_CMD)
