@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+
+"""
+Development Shell
+
+This script invokes a Docker chroot jail,
+called a "development shell".
+
+For interactive use, provide an image name from the devsh.cfg file.
+
+Examples:
+
+    1. Invoke an interactive terminal:
+
+        $ ./devsh synopsys.vcs-mx:K-2015.09-SP1
+
+    2. Execute a command:
+
+        $ ./devsh synopsys.vcs-mx:K-2015.09-SP1 -- vcs -ID
+"""
+
+import argparse
+import configparser
+import grp
+import os
+import pwd
+import subprocess as sp
+import sys
+
+
+DOCKER = "/usr/bin/docker"
+DPATH = os.path.dirname(os.path.abspath(__file__))
+CONFIG = os.path.join(DPATH, "devsh.cfg")
+
+
+def error(message, code=1):
+    """Print error message, and exit with code."""
+    print("ERROR:", message)
+    sys.exit(code)
+
+
+def interpret_config(data, context):
+    """Return a Config object that's organized."""
+    cfg = type("Config", (), {})
+
+    cfg.topdir = os.path.abspath(os.path.join(DPATH, data["topdir"]))
+
+    cfg.env = dict()
+    for line in data["env"].splitlines():
+        if line:
+            try:
+                index = line.index("=")
+            except ValueError:
+                key, val = line, None
+            else:
+                key, val = line[:index], line[index+1:]
+            cfg.env[key] = val
+
+    cfg.build = [line.format(**context)
+                 for line in data["build"].splitlines() if line]
+    cfg.volumes = [line.format(**context)
+                   for line in data["volumes"].splitlines() if line]
+
+    return cfg
+
+
+cfgp = configparser.SafeConfigParser()
+cfgp.read(CONFIG)
+
+argp = argparse.ArgumentParser("Development Shell")
+argp.add_argument("name", choices=cfgp.sections(), help="Dev shell name")
+argp.add_argument("args", nargs="*", help="Dev shell arguments")
+opt = argp.parse_args()
+
+# Check for Docker
+try:
+    output = sp.check_output([DOCKER, "version"])
+except OSError:
+    error("docker version failed!")
+
+# Setup template expansion context
+uid = os.getuid()
+pw = pwd.getpwuid(uid)
+gr = grp.getgrgid(pw.pw_gid)
+context = dict(name=opt.name, uid=uid, pw=pw, gr=gr,
+               user=pw.pw_name, home=pw.pw_dir)
+
+# Interpret configuration data
+data = dict(cfgp.items(opt.name))
+cfg = interpret_config(data, context)
+
+# Figure out whether my working directory is in an external volume
+workdir = "/work"
+mount_workdir = True
+for volume in cfg.volumes:
+    path = volume.split(":")[0]
+    if DPATH.startswith(path):
+        workdir = cfg.topdir
+        mount_workdir = False
+        break
+
+# Load the base image
+lines = sp.check_output([DOCKER, "images", opt.name]).decode("utf-8").splitlines()
+if len(lines) != 2:
+    error("Unable to find image name: " + opt.name)
+image_id = lines[1].split()[2]
+
+# Construct "docker build ..." command
+build = "\n".join("RUN " + cmd for cmd in cfg.build)
+
+dockerfile = """
+FROM {}
+RUN groupadd -g {pw.pw_gid} {gr.gr_name}
+RUN useradd -m -g {pw.pw_gid} -u {pw.pw_uid} {pw.pw_name}
+{}
+WORKDIR {}
+USER {pw.pw_name}
+""".format(opt.name, build, workdir, **context)
+
+tag = "devsh-" + image_id
+args = [DOCKER, "build", "-t", tag, "-"]
+
+# Execute "docker build ..."
+proc = sp.Popen(args, stdin=sp.PIPE)
+proc.stdin.write(dockerfile.encode())
+proc.stdin.close()
+
+if proc.wait() != 0:
+    error("docker build failed!")
+
+# Construct "docker run ..." command
+args = [DOCKER, "run", "-i", "--rm", "--net=host"]
+
+for key, val in cfg.env.items():
+    args.append("-e")
+    args.append((key + "=" + val) if val else key)
+
+for volume in cfg.volumes:
+    args += ["-v", volume]
+
+if mount_workdir:
+    args += ["-v", DPATH + ":" + workdir]
+
+if opt.args:
+    args.append(tag)
+    args += opt.args
+else:
+    args.append("-t")
+    args.append(tag)
+    args.append("bash")
+
+# Execute "docker run ..."
+os.execv(DOCKER, args)
